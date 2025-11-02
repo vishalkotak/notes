@@ -1,0 +1,15 @@
+# Obsidian specific
+.obsidian/workspace
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspaces.json
+.obsidian/app.json
+.obsidian/graph.json
+.obsidian/publish.json
+.obsidian/cache
+
+# macOS specific
+.DS_Store
+
+# Trash
+.trash/

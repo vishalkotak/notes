@@ -1,0 +1,27 @@
+{
+  "token": "kzOV0V4Y9iVt4leCTXEsra4kXb7q0bhWJE2ZT6nfc6NR524Ev4",
+  "readwiseDir": "Readwise",
+  "frequency": "0",
+  "triggerOnLoad": true,
+  "isSyncing": false,
+  "lastSyncFailed": true,
+  "lastSavedStatusID": 13686997,
+  "currentSyncStatusID": 0,
+  "refreshBooks": false,
+  "booksToRefresh": [],
+  "booksIDsMap": {
+    "computer-science-knowledge/books/cpython/CPython Internals.md": "39238216",
+    "Readwise/Books/CPython Internals.md": "39238216",
+    "Readwise/Books/Crafting Interpreters.md": "39232527",
+    "Readwise/Books/Effective Python.md": "39232526",
+    "Readwise/Books/Greenlights.md": "39232534",
+    "Readwise/Books/How Computers Really Work.md": "39232525",
+    "Readwise/Books/Poor Charlie’s Almanack.md": "39232529",
+    "Readwise/Books/The Kubernetes Book.md": "39232524",
+    "Readwise/Books/The Pragmatic Programmer.md": "39232533",
+    "Readwise/Books/The TB12 Method.md": "39232530",
+    "Readwise/Books/Understanding Distributed Systems.md": "39232532",
+    "Readwise/Books/Writing a Compiler in Go.md": "39232535"
+  },
+  "reimportShowConfirmation": true
+}

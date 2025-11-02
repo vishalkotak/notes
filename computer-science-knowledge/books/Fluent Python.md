@@ -1,0 +1,2 @@
+- Python interpreter uses a single thread to run user's program and the memory garbage collector. 
+- Access to object reference counts and other internal interpreter state is controlled by the lock, the Global Interpreter Lock (GIL). Only one Python thread can hold the GIL at any time.
