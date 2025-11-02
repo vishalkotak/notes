@@ -3,7 +3,13 @@
 - Rust strings are UTF-8 encoded and can contain any Unicode character
 - *main* function is the entry point for the program
 ### Values
-![[Pasted image 20251101222839.png]]
+| **Types**              | **Literals**                                      |
+|-------------------------|---------------------------------------------------|
+| **Signed integers**     | `i8`, `i16`, `i32`, `i64`, `i128`, `isize`       | `-10`, `0`, `1_000`, `123_i64`       |
+| **Unsigned integers**   | `u8`, `u16`, `u32`, `u64`, `u128`, `usize`       | `0`, `123`, `10_u16`                 |
+| **Floating point nums** | `f32`, `f64`                                     | `3.14`, `-10.0e20`, `2_f32`          |
+| **Unicode scalars**     | `char`                                           | `'a'`, `'α'`, `'∞'`                  |
+| **Booleans**            | `bool`                                           | `true`, `false`                      |
 - `usize` and `isize` are pointer-width because they are designed to hold memory addresses, array indices, and sizes which are directly tied to how a computer architecture addresses memory
 ### Arithmetic 
 ```rust
@@ -378,18 +384,61 @@ impl Deck {
 
 ### Ownership, Borrowing and Lifetimes
 
-12 rules that you need to remember
+**12 rules that you need to remember**
 
-![[Pasted image 20251101124628.png]]
+| No | Rule                                                                                                              | Category     |
+|----|--------------------------------------------------------------------------------------------------------------------|---------------|
+| 1  | Every value is 'owned' by a single variable, struct, vector, etc at a time                                         | **Ownership** |
+| 2  | Reassigning the value to another variable, passing it to a function, putting it into a vector, etc, *moves* it. The old variable can't be used anymore! | **Ownership** |
+| 3  | You can create many read-only references to a value that exist at the same time                                   | **Borrowing** |
+| 4  | You can't move a value while a ref to the value exists                                                            | **Borrowing** |
+| 5  | You can make a writable (mutable) reference to a value *only if* there are no read-only references currently in use. One mutable ref to a value can exist at a time | **Borrowing** |
+| 6  | You can't mutate a value through the owner when any ref (mutable or immutable) to the value exists                | **Borrowing** |
+| 7  | Some types of values are *copied* instead of moved (numbers, bools, chars, arrays/tuples with copyable elements)   | **Lifetimes** |
+| 8  | When a variable goes out of scope, the value owned by it is *dropped* (cleaned up in memory)                      | **Lifetimes** |
+| 9  | Values can't be dropped if there are still active references to it                                                | **Lifetimes** |
+| 10 | References to a value can't outlive the value they refer to                                                       | **Lifetimes** |
+| 11 | **These rules will dramatically change how you write code (compared to other languages)**                         |               |
+| 12 | **When in doubt, remember that Rust wants to minimize unexpected updates to data**                                |               |
 #### Updates
 
 - The goal of ownership is to limit the way you can reference and change data
 - This limitation will reduce the number of bugs + make your code easier to understand
+```javascript
+engine = { working : false }
+> {working: false}
 
-![[Pasted image 20251101130152.png]]
-![[Pasted image 20251101130207.png]]
-![[Pasted image 20251101130223.png]]
-![[Pasted image 20251101130237.png]]
+mustang = { name: mustang, engine: engine }
+> mustang = { name: "mustang", engine: engine }
+> {name: 'mustang', engine: {…}}
+  engine: {working: true}
+  name: "mustang"
+  [[Prototype]]: Object
+
+camero = { name: "camero", engine: engine }
+> {name: 'camero', engine: {…}}
+  engine: {working: true}
+  name: "camero"
+  [[Prototype]]: Object
+
+function checkEngine(car) {
+  if (car.name === "mustang") {
+    car.engine.working = true
+  }
+}
+
+mustang
+> {name: 'mustang', engine: {…}}
+  engine: {working: true}
+  name: "mustang"
+  [[Prototype]]: Object
+
+camero
+> {name: 'camero', engine: {…}}
+  engine: {working: true}
+  name: "camero"
+  [[Prototype]]: Object
+```
 
 - Changing engine for mustang changed engine condition for camero too because they were pointing to the same engine object.
 
@@ -432,10 +481,9 @@ The above rules were simplified to demonstrate a point. In practical terms, the 
 	- Good solution is to use a mutable reference
 - You can make a writable (mutable) reference to a value only if there are no read-only references currently in use. One mutable ref to a value can exist at a time.
 - You can't mutate a value through the owner when any ref (mutable or immutable) to the value exists
-
 ### Trait, Struct and For Keyword
 
-- **Struct**: Custom data type that allows you to group related data togethe
+- **Struct**: Custom data type that allows you to group related data together.
 - **Trait**: Defines a set of methods that a type must provide. It's like a contract or an interface. Trait defines a behavior but it doesn't provide the data or the implementation itself.
 
 ```rust
