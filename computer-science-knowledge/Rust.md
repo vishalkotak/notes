@@ -351,7 +351,6 @@ fn main() {
 - A `&[u8]` on the other hand is just a slice of raw bytes. It could be anything: UTF-8, image data, or just random binary noise. Because of this the two data types are not interchangeable.
 - `&str` to `&[u8]` is safe and easy. This is always safe because a valid UTF-8 string is, by definition a valid sequence of bytes. You can use `as_bytes()` method.
 - `&[u8]` to `&str` : This conversion can fail because the byte slice might not be valid UTF-8. You must explicitly check it, which is why Rust provides `std::str::from_utf8().`
-
 ### Implementation and Methods
 
 - Same name as a struct
@@ -381,7 +380,32 @@ impl Deck {
 
 - Associated function tied to the struct definition
 - Methods operate on a specific instance of a struct
-
+#### Modules
+- A way to group related code together, under a common namespace (i.e. module's name)
+##### Inline Modules
+```rust
+mod tests {
+}
+```
+- The module declaration `mod tests` and the module contents (the stuff inside `{...}`) are next to each other.
+##### Module Tree
+- Modules can be nested, forming a tree structure
+- Root of the tree is the **crate** itself, which is the top level module that contains all the other modules
+- For a library crate, the root module is **src/lib.rs**
+##### External modules and filesystem
+- You have to use a **path** pointing to the entity you want to access
+- You can compose path in various ways:
+	- starting from the root of the current crate, e.g. `crate::module_1::MyStruct`
+	- starting from the parent module, e.g. `super::my_function`
+	- starting from the current module, e.g. `sub_module_1::MyStruct`
+- Both **crate** and **super** are keywords
+- `crate` refers to the root of the current state, while `super` refers to the parent of the current module.
+#### Visibility
+- **Private** by default
+- A private entity can only be accessed by:
+	- within the same module where it is defined
+	- by one of it's submodules
+- 
 ### Ownership, Borrowing and Lifetimes
 
 **12 rules that you need to remember**
@@ -520,5 +544,79 @@ impl Summarize for Tweet {
 ```
 ### Copyable values
 - Some types of values are copied instead of moved (numbers, bools, chars, array/tuples with copyable elements.)
+### Threads
+- Each thread has it's own stack and instruction pointer
+- Single process can manage multiple threads
+- Rust program starts on the main thread, created by the operating system and responsible for running the main function.
+- `std::thread` allows you to create and manage threads
+- `std::thread::spawn` to create new threads and executes code on them
+```rust
+use std::thread;
+use std::time::Duration;
 
+fn main() {
+    let handle = thread::spawn(|| {
+        loop {
+            thread::sleep(Duration::from_secs(1));
+            println!("Hello from a thread!");
+        }
+    });
+    
+    loop {
+        thread::sleep(Duration::from_secs(2));
+        println!("Hello from the main thread!");
+    }
+}
+```
+- When the main thread finishes, the overall process will exit
+- A spawned thread will continue running until it finishes or the process terminates i.e. main thread has finished execution
+- You can also wait for a spawned thread to finish by calling the `join` method on the `JoinHandle` that spawn returns.
+```rust
+use std::thread;
 
+fn main() {
+    let handle = thread::spawn(|| {
+        println!("Hello from a thread!");
+    });
+    handle.join().unwrap();
+}
+```
+
+Sample code to use threads for finding the sum of all elements of the vector:
+```rust
+use std::thread;
+
+pub fn sum(v: Vec<i32>) -> i32 {
+	let mid = v.len() / 2;
+	let (left, right) = v.split_at(mid);
+
+    // Convert the left slice (&[T]) into a new vector so that it owns its data.
+    // This is necessary because threads need to take ownership of the data they use.
+	let left_half = left.to_vec();
+	let right_half = right.to_vec();
+
+	// The `move` keyword transfers ownership of the left_half into the closure,
+	// so the main thread no longer owns it.
+	let handle1 = thread::spawn(move|| {
+		let sum_left: i32 = left_half.iter().sum();
+		sum_left
+	});
+	let handle2 = thread::spawn(move|| {
+		let sum_right: i32 = right_half.iter().sum();
+		sum_right
+	});
+	
+	// The join() method blocks the main thread until the handle completes.
+	// join() returns Result<T, Box<dyn Any + Send + `static>> i.e. Result<T, E>
+	// expect() is defined on Rust's result type.	
+	// If the result is Ok(value), it unwraps and gives you value.
+	// If it's Err(error), it panics and prints the message you provided (msg)
+	// along with debug info about the error.
+	let sum_left = handle1.join().expect("Thread 1 panicked");
+	let sum_right = handle2.join().expect("Thread 2 panicked");
+	
+	let total_sum = sum_left + sum_right;
+	println!("Total sum: {}", total_sum);
+	total_sum
+}
+```
